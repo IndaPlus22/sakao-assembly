@@ -1,0 +1,28 @@
+op 2 bits
+    add/sub(000)  con , rs, rt  reg(rd) += reg(rt)
+      3           1      2  2
+    addi(001)     rs, imm    
+      3           2   3 
+    jmp(010)     label(adr)       jump to        
+      3            5
+    jeq(011)     rt, rs      if reg(rt) == reg(rs), skip one row
+      3           2   2
+    seti(100)    rd, imm      reg(rd) += imm
+      3           2   3     
+    prnt(101)    
+      3
+    input(110)
+      3
+    exit(111)
+      3
+
+
+t0 (00) is always 0
+t1 (01), 
+t2 (10), 
+t3 (11)
+
+
+
+
+
