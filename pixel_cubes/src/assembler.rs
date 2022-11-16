@@ -40,7 +40,15 @@ pub fn run() {
         let op = parse_op_color(code[i][0].to_string()).expect("op bruh");
 
         match op.0 {
-            0 => ,
+            0 => {
+                
+            },
+            1 => {
+
+            },
+            2 => {
+
+            }
             _ => println!("bruh111")
         }
     }
@@ -88,7 +96,7 @@ fn parse_op_color(color: String) -> Result<(u8, OperationCode), String> {
     }
 }
 
-fn parse_reg_color(color: String) -> Result<(Registry)> {
+fn parse_reg_color(color: String) -> Result<(Registry), String> {
     match color.as_str() {
         "5F7D6E" => Ok((R0)),
         "AFBEB3" => Ok((R1)),
