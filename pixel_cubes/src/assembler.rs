@@ -38,15 +38,15 @@ pub fn run(input_path: &str) {
         binary.push(op.1.to_string());
         match op.0 {
             0 => { // arithmetic op
-                binary[i].push_str(parse_reg_color(code[i][1].to_string()).expect("reg fail"));
-                binary[i].push_str(parse_reg_color(code[i][2].to_string()).expect("reg fail"));
+                binary[i].push_str(parse_reg_color(code[i][1].to_string()).expect("reg fail").as_str());
+                binary[i].push_str(parse_reg_color(code[i][2].to_string()).expect("reg fail").as_str());
             },
             1 => { // imm op
-                binary[i].push_str(parse_reg_color(code[i][1].to_string()).expect("reg fail"));
-                binary[i].push_str(parse_imm_color(code[i][2].to_string()).expect("imm fail"));
+                binary[i].push_str(parse_reg_color(code[i][1].to_string()).expect("reg fail").as_str());
+                binary[i].push_str(parse_imm_color(code[i][2].to_string()).expect("imm fail").as_str());
             },
             2 => { // jmp op
-                binary[i].push_str(parse_adress_color(code[i][1].to_string()).expect("reg fail"));
+                binary[i].push_str(parse_adress_color(code[i][1].to_string()).expect("reg fail").as_str());
             }
             _ => println!("bruh111")
         }
@@ -83,54 +83,69 @@ fn init(input_path: &str) -> Vec<Vec<String>> {
 
         print!("{} ", to_hex(p.2));
     }
-
+    code = remove_empty_vecs(code);
     code
 }
 
-fn parse_op_color(color: String) -> Result<(u8, &'static str), String> {
+fn remove_empty_vecs(vec: Vec<Vec<String>>) -> Vec<Vec<String>> {
+    let mut tmp = Vec::new();
+    
+    for i in 0..vec.len() {
+        if vec[i].len() != 0 {
+            tmp.push(vec[i].clone());
+        }
+    }
+    tmp
+}
+
+fn parse_op_color(color: String) -> Result<(u8, String), String> {
     // println!("hex: {}", color);
     match color.as_str() {
-        "57AAA4" => Ok((0, ADD_OP)),
-        "ADC9CB" => Ok((1, ADDI_OP)),
-        "ECDBAB" => Ok((2, JMP_OP)),
-        "F38D68" => Ok((0, JEQ_OP)),
-        "E15E64" => Ok((1, SET_OP)),
-        "EBD9BE" => Ok((2, CAL_OP)),
+        "57AAA4" => Ok((0, ADD_OP.to_string())),
+        "ADC9CB" => Ok((1, ADDI_OP.to_string())),
+        "ECDBAB" => Ok((2, JMP_OP.to_string())),
+        "F38D68" => Ok((0, JEQ_OP.to_string())),
+        "E15E64" => Ok((1, SET_OP.to_string())),
+        "EBD9BE" => Ok((2, CAL_OP.to_string())),
         _ => Err("invalid operation color".to_string())
     }
 }
 
-fn parse_reg_color(color: String) -> Result<&'static str, String> {
+fn parse_reg_color(color: String) -> Result<String, String> {
     match color.as_str() {
-        "5F7D6E" => Ok((R0)),
-        "AFBEB3" => Ok((R1)),
-        "F4F5F4" => Ok((R2)),
-        "C3A280" => Ok((R3)),
+        "5F7D6E" => Ok(R0.to_string()),
+        "AFBEB3" => Ok(R1.to_string()),
+        "F4F5F4" => Ok(R2.to_string()),
+        "C3A280" => Ok(R3.to_string()),
         _ => Err("invalid reg color".to_string())
     }
 }
 
-// TODO:
-fn parse_imm_color(color: String) -> Result<&'static str, String> {
+
+fn parse_imm_color(color: String) -> Result<String, String> {
+    let num = parse_num_color(color);
+    if num < 1 || num > 8 {
+        Err("invalid imm color".to_string())
+    } else {
+        Ok(format!("{:03b}", num))
+    }
+}
+
+fn parse_num_color(color: String) -> u64 {
     let mut tmp: u64 = u64::from_str_radix(color.as_str(), 16).unwrap();
     let cerise: u64 = 0xDE3163; 
 
     tmp -= cerise;
-    if tmp < 1 || tmp > 8 {
-        Err("invalid imm color".to_string())
-    } else {
-        Ok(format!("{:03X?}", tmp).as_str())
-    }
+    tmp / 10
 }
 
 // TODO:
-fn parse_adress_color(color: String) -> Result<&'static str, String> {
-    match color.as_str() {
-        "5F7D6E" => Ok((R0)),
-        "AFBEB3" => Ok((R1)),
-        "F4F5F4" => Ok((R2)),
-        "C3A280" => Ok((R3)),
-        _ => Err("invalid reg color".to_string())
+fn parse_adress_color(color: String) -> Result<String, String> {
+    let num = parse_num_color(color);
+    if num < 0 || num > 2^5 {
+        Ok(format!("{:05X?}", num))
+    } else {
+        Err("invalid adress color".to_string())
     }
 }
 
