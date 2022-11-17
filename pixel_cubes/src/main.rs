@@ -12,5 +12,5 @@ use image::Pixels;
 
 
 fn main() {
-    
+    assembler::run("test2.png");
 }

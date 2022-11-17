@@ -6,6 +6,7 @@ use std::fmt::Binary;
 use std::path::Path;
 use std::fmt::Display;
 use std::string;
+use std::u64;
 
 // inspiration from Viola :)
 
@@ -13,45 +14,48 @@ use std::string;
 const INSTRUCTION_LENGTH: usize = 8;
 
 /* Operation codes. */
-type OperationCode = String;
-const ADD_OP: OperationCode  = String::from("000");
-const ADDI_OP: OperationCode = String::from("001");
-const JMP_OP: OperationCode  = String::from("010");
-const JEQ_OP: OperationCode  = String::from("011");
-const SET_OP: OperationCode  = String::from("100");
-const CAL_OP: OperationCode  = String::from("101");
+const ADD_OP: &str  = "000";
+const ADDI_OP: &str = "001";
+const JMP_OP: &str  = "010";
+const JEQ_OP: &str  = "011";
+const SET_OP: &str  = "100";
+const CAL_OP: &str  = "101";
 // one more
 
-/* Registry addresses. */
-type Registry = String;
-const R0: Registry = String::from("00"); // always zero
-const R1: Registry = String::from("01");
-const R2: Registry = String::from("10");
-const R3: Registry = String::from("11");
+/* &str addresses. */
+const R0: &str = "00"; // always zero
+const R1: &str = "01";
+const R2: &str = "10";
+const R3: &str = "11";
 
-pub fn run() {
-    let code: Vec<Vec<String>> = init("test2.png");
-    let mut binary: Vec<Vec<String>> = Vec::new();
-    
+pub fn run(input_path: &str) {
+    let code: Vec<Vec<String>> = init(input_path);
+    let mut binary: Vec<String> = Vec::new();
     
     for i in 0..code.len() {
-        let mut row: Vec<String> = Vec::new();
-
         let op = parse_op_color(code[i][0].to_string()).expect("op bruh");
 
+        binary.push(op.1.to_string());
         match op.0 {
-            0 => {
-                
+            0 => { // arithmetic op
+                binary[i].push_str(parse_reg_color(code[i][1].to_string()).expect("reg fail"));
+                binary[i].push_str(parse_reg_color(code[i][2].to_string()).expect("reg fail"));
             },
-            1 => {
-
+            1 => { // imm op
+                binary[i].push_str(parse_reg_color(code[i][1].to_string()).expect("reg fail"));
+                binary[i].push_str(parse_imm_color(code[i][2].to_string()).expect("imm fail"));
             },
-            2 => {
-
+            2 => { // jmp op
+                binary[i].push_str(parse_adress_color(code[i][1].to_string()).expect("reg fail"));
             }
             _ => println!("bruh111")
         }
     }
+
+    for i in 0..code.len() {
+        println!("{}: {}", i, binary[i]);
+    }
+
 }
 
 fn init(input_path: &str) -> Vec<Vec<String>> {
@@ -83,7 +87,7 @@ fn init(input_path: &str) -> Vec<Vec<String>> {
     code
 }
 
-fn parse_op_color(color: String) -> Result<(u8, OperationCode), String> {
+fn parse_op_color(color: String) -> Result<(u8, &'static str), String> {
     // println!("hex: {}", color);
     match color.as_str() {
         "57AAA4" => Ok((0, ADD_OP)),
@@ -96,7 +100,31 @@ fn parse_op_color(color: String) -> Result<(u8, OperationCode), String> {
     }
 }
 
-fn parse_reg_color(color: String) -> Result<(Registry), String> {
+fn parse_reg_color(color: String) -> Result<&'static str, String> {
+    match color.as_str() {
+        "5F7D6E" => Ok((R0)),
+        "AFBEB3" => Ok((R1)),
+        "F4F5F4" => Ok((R2)),
+        "C3A280" => Ok((R3)),
+        _ => Err("invalid reg color".to_string())
+    }
+}
+
+// TODO:
+fn parse_imm_color(color: String) -> Result<&'static str, String> {
+    let mut tmp: u64 = u64::from_str_radix(color.as_str(), 16).unwrap();
+    let cerise: u64 = 0xDE3163; 
+
+    tmp -= cerise;
+    if tmp < 1 || tmp > 8 {
+        Err("invalid imm color".to_string())
+    } else {
+        Ok(format!("{:03X?}", tmp).as_str())
+    }
+}
+
+// TODO:
+fn parse_adress_color(color: String) -> Result<&'static str, String> {
     match color.as_str() {
         "5F7D6E" => Ok((R0)),
         "AFBEB3" => Ok((R1)),
