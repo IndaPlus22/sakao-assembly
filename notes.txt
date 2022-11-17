@@ -1,27 +1,36 @@
 op 2 bits
-    add/sub(000)  con , rs, rt  reg(rd) += reg(rt)
-      3           1      2  2
-    addi(001)     rs, imm    
-      3           2   3 
-    jmp(010)     label(adr)       jump to        
-      3            5
-    jeq(011)     rt, rs      if reg(rt) == reg(rs), skip one row
-      3           2   2
-    seti(100)    rd, imm      reg(rd) += imm
-      3           2   3     
-    prnt(101)    
-      3
-    input(110)
-      3
-    exit(111)
-      3
+    add(000) 57AAA4  rs, rt  reg(rd) += reg(rt)
+      3               2  2
+    addi(001) ADC9CB    rs, imm    
+      3                 2   3 
+    jmp(010) ECDBAB    label(adr)       jump to        
+      3                 5
+    jeq(011) F38D68    rt, rs      if reg(rt) == reg(rs), skip one row
+      3                 2   2
+    set(100) E15E64   rd, imm      reg(rd) += imm
+      3                 2   3     
+    syscall(101) EBD9BE
 
 
-t0 (00) is always 0
-t1 (01), 
-t2 (10), 
-t3 (11)
+t0 (00) 5F7D6E is always 0
+t1 (01) AFBEB3
+t2 (10) F4F5F4
+t3 (11) C3A280
 
+imm ints
+-1 ==DE3153 
+0 == DE3163
+1 == DE3173
+2 == DE3183
+3 == DE3193
+4 == ...
+...
+7 == DE31d3
+8 == DE31e3
+
+spec
+; = 000000
+nothing = ffffff
 
 
 
